@@ -1,0 +1,131 @@
+5195a5196,5325
+> /* yank urls */
+> static void
+> do_yank(char *url)
+> {
+>     Str cmd;
+>     char *yank = NULL;
+>     int bg = 0, len;
+> 
+>     CurrentKeyData = NULL;	/* not allowed in w3m-control: */
+>     yank = searchKeyData();
+>     if (yank == NULL || *yank == '\0') {
+>     yank = YankCommand;
+>     }
+>     else {
+>     yank = conv_to_system(yank);
+>     }
+>     if (yank == NULL || *yank == '\0') {
+> 	displayBuffer(Currentbuf, B_NORMAL);
+> 	return;
+>     }
+> 
+>     if ((len = strlen(yank)) >= 2 && yank[len - 1] == '&' &&
+> 	yank[len - 2] != '\\') {
+> 	yank = allocStr(yank, len - 2);
+> 	bg = 1;
+>     }
+>     cmd = myExtCommand(yank, shell_quote(url), FALSE);
+>     Strremovetrailingspaces(cmd);
+>     fmTerm();
+>     mySystem(cmd->ptr, bg);
+>     fmInit();
+>     displayBuffer(Currentbuf, B_FORCE_REDRAW);
+> }
+> 
+> DEFUN(yankpage, YANK_PAGE, "Yank page url")
+> {
+>     if (Currentbuf->bufferprop & BP_INTERNAL) {
+> 	/* FIXME: gettextize? */
+> 	disp_err_message("Can't yank...", TRUE);
+> 	return;
+>     }
+>     if (Currentbuf->currentURL.scheme == SCM_LOCAL &&
+> 	!strcmp(Currentbuf->currentURL.file, "-")) {
+> 	/* file is std input */
+> 	/* FIXME: gettextize? */
+> 	disp_err_message("Can't yank stdin", TRUE);
+> 	return;
+>     }
+>     do_yank(parsedURL2Str(&Currentbuf->currentURL)->ptr);
+> }
+> 
+> DEFUN(yanklink, YANK_LINK, "Yank link URL")
+> {
+>     Anchor *a;
+>     ParsedURL pu;
+> 
+>     if (Currentbuf->firstLine == NULL)
+> 	return;
+>     a = retrieveCurrentAnchor(Currentbuf);
+>     if (a == NULL)
+> 	return;
+>     parseURL2(a->url, &pu, baseURL(Currentbuf));
+>     do_yank(parsedURL2Str(&pu)->ptr);
+> }
+> 
+> /* open in mediaplayer */
+> static void
+> invoke_mediaplayer(char *url)
+> {
+>     Str cmd;
+>     char *mediaplayer = NULL;
+>     int bg = 0, len;
+> 
+>     CurrentKeyData = NULL;	/* not allowed in w3m-control: */
+>     mediaplayer = searchKeyData();
+>     if (mediaplayer == NULL || *mediaplayer == '\0') {
+>     mediaplayer = MediaPlayerCommand;
+>     }
+>     else {
+>     mediaplayer = conv_to_system(mediaplayer);
+>     }
+>     if (mediaplayer == NULL || *mediaplayer == '\0') {
+> 	displayBuffer(Currentbuf, B_NORMAL);
+> 	return;
+>     }
+> 
+>     if ((len = strlen(mediaplayer)) >= 2 && mediaplayer[len - 1] == '&' &&
+> 	mediaplayer[len - 2] != '\\') {
+> 	mediaplayer = allocStr(mediaplayer, len - 2);
+> 	bg = 1;
+>     }
+>     cmd = myExtCommand(mediaplayer, shell_quote(url), FALSE);
+>     Strremovetrailingspaces(cmd);
+>     fmTerm();
+>     mySystem(cmd->ptr, bg);
+>     fmInit();
+>     displayBuffer(Currentbuf, B_FORCE_REDRAW);
+> }
+> 
+> DEFUN(mediaplayerpage, MEDIAPLAYER_PAGE, "Open URL in mediaplayer")
+> {
+>     if (Currentbuf->bufferprop & BP_INTERNAL) {
+> 	/* FIXME: gettextize? */
+> 	disp_err_message("Can't play...", TRUE);
+> 	return;
+>     }
+>     if (Currentbuf->currentURL.scheme == SCM_LOCAL &&
+> 	!strcmp(Currentbuf->currentURL.file, "-")) {
+> 	/* file is std input */
+> 	/* FIXME: gettextize? */
+> 	disp_err_message("Can't play stdin", TRUE);
+> 	return;
+>     }
+>     invoke_mediaplayer(parsedURL2Str(&Currentbuf->currentURL)->ptr);
+> }
+> 
+> DEFUN(mediaplayerlink, MEDIAPLAYER_LINK, "Open link in mediaplayer")
+> {
+>     Anchor *a;
+>     ParsedURL pu;
+> 
+>     if (Currentbuf->firstLine == NULL)
+> 	return;
+>     a = retrieveCurrentAnchor(Currentbuf);
+>     if (a == NULL)
+> 	return;
+>     parseURL2(a->url, &pu, baseURL(Currentbuf));
+>     invoke_mediaplayer(parsedURL2Str(&pu)->ptr);
+> }
+> 

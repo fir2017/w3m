@@ -1,0 +1,6 @@
+148a149,150
+> #define CMT_YANK         N_("Yank Command")
+> #define CMT_MEDIAPLAYER  N_("Mediaplayer Command")
+569a572,573
+>     {"yankcommand", P_STRING, PI_TEXT, (void *)&YankCommand, CMT_YANK, NULL},
+>     {"mediaplayercommand", P_STRING, PI_TEXT, (void *)&MediaPlayerCommand, CMT_MEDIAPLAYER, NULL},

@@ -1,0 +1,5 @@
+112a113,116
+> extern void yankpage(void);
+> extern void yanklink(void);
+> extern void mediaplayerpage(void);
+> extern void mediaplayerlink(void);

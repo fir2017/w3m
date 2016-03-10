@@ -1,0 +1,3 @@
+996a997,998
+> global char *YankCommand init(NULL);
+> global char *MediaPlayerCommand init(NULL);
